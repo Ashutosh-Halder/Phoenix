@@ -1,0 +1,24 @@
+{
+  "name": "sf-metadata-to-notion-cli",
+  "version": "0.1.0",
+  "description": "CLI tool to parse Salesforce metadata XML and sync to Notion as hierarchical documentation.",
+  "main": "src/cli.js",
+  "type": "module",
+  "scripts": {
+    "start": "node src/cli.js",
+    "watch": "node src/watcher.js",
+    "sync": "node src/sync.js"
+  },
+  "dependencies": {
+    "chokidar": "^3.5.3",
+    "dotenv": "^17.2.0",
+    "fast-xml-parser": "^4.3.5",
+    "mermaid": "^10.9.0",
+    "notion-client": "^1.0.0",
+    "sqlite": "^5.1.1",
+    "sqlite3": "^5.1.6"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.3"
+  }
+}
