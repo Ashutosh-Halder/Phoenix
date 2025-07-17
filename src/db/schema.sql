@@ -90,3 +90,15 @@ CREATE TABLE IF NOT EXISTS list_views (
     last_modified DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY(object_id) REFERENCES objects(id)
 );
+
+-- Table for Flows
+CREATE TABLE IF NOT EXISTS flows (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    api_name TEXT UNIQUE,
+    label TEXT,
+    description TEXT,
+    status TEXT,
+    process_type TEXT,
+    details_json TEXT,
+    last_modified DATETIME DEFAULT CURRENT_TIMESTAMP
+);

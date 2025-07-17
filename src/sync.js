@@ -197,3 +197,38 @@ export async function syncObjectToDb(parsed) {
   }
   await db.close();
 }
+
+export async function syncFlowToDb(parsed) {
+  const db = await getDb();
+  const { api_name, label, description, status, process_type, details } =
+    parsed;
+  let flowId;
+  const flowRow = await db.get(
+    "SELECT id FROM flows WHERE api_name = ?",
+    api_name
+  );
+  if (flowRow) {
+    await db.run(
+      "UPDATE flows SET label = ?, description = ?, status = ?, process_type = ?, details_json = ?, last_modified = CURRENT_TIMESTAMP WHERE id = ?",
+      label,
+      description,
+      status,
+      process_type,
+      JSON.stringify(details),
+      flowRow.id
+    );
+    flowId = flowRow.id;
+  } else {
+    const result = await db.run(
+      "INSERT INTO flows (api_name, label, description, status, process_type, details_json) VALUES (?, ?, ?, ?, ?, ?)",
+      api_name,
+      label,
+      description,
+      status,
+      process_type,
+      JSON.stringify(details)
+    );
+    flowId = result.lastID;
+  }
+  return flowId;
+}

@@ -1,4 +1,5 @@
 import { objectTemplate, renderObjectTemplate } from "./objectTemplate.js";
+import { flowTemplate } from "./objectTemplate.js";
 import {
   fetchAllDatabaseRows,
   notionApiRequest,
@@ -9,6 +10,7 @@ export class TemplateManager {
   constructor() {
     this.templates = {
       objects: objectTemplate,
+      flows: flowTemplate,
       // Future templates will be added here
       // fields: fieldTemplate,
       // validationRules: validationRuleTemplate,

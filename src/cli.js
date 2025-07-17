@@ -7,6 +7,9 @@ import { templateManager } from "./templates/templateManager.js";
 import { templateImporter } from "./templates/templateImporter.js";
 import fs from "fs";
 import { syncObjectToNotion } from "./notion/sync.js";
+import { parseFlow } from "./parser/flowParser.js";
+import { syncFlowToDb } from "./sync.js";
+import { syncFlowToNotion } from "./notion/sync.js";
 
 const opportunityDir = path.resolve("Opportunity");
 
@@ -68,6 +71,77 @@ async function main() {
     await syncObjectToDb(parsed);
     console.log("DB sync complete.");
     return;
+  }
+
+  if (arg === "sync-flows") {
+    // Support --flows-path argument
+    const flowsPathArg = process.argv.find((a) => a.startsWith("--flows-path"));
+    let flowsPath = null;
+    if (flowsPathArg) {
+      const split = flowsPathArg.split("=");
+      flowsPath =
+        split.length > 1
+          ? split[1]
+          : process.argv[process.argv.indexOf(flowsPathArg) + 1];
+    }
+    if (flowsPath) {
+      // Iterate all .flow-meta.xml files
+      const flowFiles = fs
+        .readdirSync(flowsPath)
+        .filter((f) => f.endsWith(".flow-meta.xml"));
+      for (const flowFile of flowFiles) {
+        const fullPath = path.join(flowsPath, flowFile);
+        try {
+          const parsed = parseFlow(fullPath);
+          if (parsed && parsed.api_name) {
+            console.log(`\n--- Syncing flow: ${parsed.api_name} ---`);
+            await syncFlowToDb(parsed);
+            await syncFlowToNotion(parsed);
+          } else {
+            console.warn(
+              `Skipping ${flowFile}: could not parse flow metadata.`
+            );
+          }
+        } catch (e) {
+          console.error(`Error syncing ${flowFile}:`, e.message);
+        }
+      }
+      return;
+    } else {
+      console.warn("No --flows-path provided for sync-flows command.");
+      return;
+    }
+  }
+
+  if (arg === "sync-flow-single") {
+    // Support --file argument
+    const fileArg = process.argv.find((a) => a.startsWith("--file"));
+    let flowFile = null;
+    if (fileArg) {
+      const split = fileArg.split("=");
+      flowFile =
+        split.length > 1
+          ? split[1]
+          : process.argv[process.argv.indexOf(fileArg) + 1];
+    }
+    if (flowFile) {
+      try {
+        const parsed = parseFlow(flowFile);
+        if (parsed && parsed.api_name) {
+          console.log(`\n--- Syncing flow: ${parsed.api_name} ---`);
+          await syncFlowToDb(parsed);
+          await syncFlowToNotion(parsed);
+        } else {
+          console.warn(`Could not parse flow metadata from file: ${flowFile}`);
+        }
+      } catch (e) {
+        console.error(`Error syncing ${flowFile}:`, e.message);
+      }
+      return;
+    } else {
+      console.warn("No --file provided for sync-flow-single command.");
+      return;
+    }
   }
 
   if (arg === "templates") {

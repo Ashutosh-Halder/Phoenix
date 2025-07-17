@@ -1,10 +1,10 @@
 const NOTION_API_URL = "https://api.notion.com/v1";
-const NOTION_API_KEY = process.env.NOTION_TOKEN || "";
 
 export async function notionApiRequest(endpoint, method = "GET", body = null) {
-  const url = `${NOTION_API_URL}${endpoint}`;
+  // Use MCP server endpoint instead of direct Notion API
+  const MCP_API_URL = process.env.MCP_API_URL || "http://localhost:3000";
+  const url = `${MCP_API_URL}${endpoint}`;
   const headers = {
-    Authorization: `Bearer ${NOTION_API_KEY}`,
     "Notion-Version": "2022-06-28",
     "Content-Type": "application/json",
   };
@@ -22,7 +22,7 @@ export async function notionApiRequest(endpoint, method = "GET", body = null) {
 
   if (!res.ok) {
     const text = await res.text();
-    throw new Error(`Notion API request failed: ${res.status} ${text}`);
+    throw new Error(`Notion MCP API request failed: ${res.status} ${text}`);
   }
 
   return res.json();

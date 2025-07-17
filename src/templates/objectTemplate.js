@@ -320,6 +320,63 @@ export const objectTemplate = {
   },
 };
 
+// Flows Template
+export const flowTemplate = {
+  overview: {
+    title: "🔁 {FLOW_NAME}",
+    structure: [
+      { type: "heading_1", content: "🔁 Flow - {FLOW_NAME}" },
+      { type: "heading_2", content: "📋 Overview" },
+      { type: "paragraph", content: "{FLOW_DESCRIPTION}" },
+      { type: "heading_2", content: "🔄 Trigger Details" },
+      {
+        type: "bulleted_list",
+        items: [
+          "🧩 Trigger Type: {FLOW_PROCESS_TYPE}",
+          "📦 Object: {OBJECT}",
+          "⚙️ Operator: {OPERATOR}",
+          "📝 Criteria: {CRITERIA}",
+          "⏰ Schedule: {SCHEDULE}",
+        ],
+      },
+      { type: "heading_2", content: "🧩 Flow Elements" },
+      { type: "heading_3", content: "Variables" },
+      { type: "paragraph", content: "{VARIABLES_TABLE}" },
+      { type: "heading_3", content: "Input Parameters (if applicable)" },
+      { type: "paragraph", content: "{INPUT_PARAMS_TABLE}" },
+      { type: "heading_3", content: "Output Parameters (if applicable)" },
+      { type: "paragraph", content: "{OUTPUT_PARAMS_TABLE}" },
+      { type: "heading_2", content: "🔄 Process Flow" },
+      { type: "code", content: "{MERMAID_DIAGRAM}", language: "mermaid" },
+      {
+        type: "numbered_list",
+        items: ["Step 1: {STEP_1}", "Step 2: {STEP_2}", "..."],
+      },
+      { type: "heading_2", content: "🔗 Related Components" },
+      {
+        type: "bulleted_list",
+        items: [
+          "🧑‍💻 Apex Classes: {APEX_CLASSES}",
+          "📦 Custom Objects: {CUSTOM_OBJECTS}",
+          "🔁 Other Flows: {OTHER_FLOWS}",
+        ],
+      },
+      { type: "heading_2", content: "⚠️ Considerations & Limitations" },
+      {
+        type: "bulleted_list",
+        items: ["{LIMITATIONS}", "{PERFORMANCE}", "{BULK_NOTES}"],
+      },
+      { type: "heading_2", content: "🧪 Testing Notes" },
+      {
+        type: "bulleted_list",
+        items: ["{TEST_SCENARIOS}", "{EXPECTED_OUTCOMES}", "{EDGE_CASES}"],
+      },
+      { type: "heading_2", content: "📝 Changelog" },
+      { type: "paragraph", content: "{CHANGELOG_TABLE}" },
+    ],
+  },
+};
+
 // Template rendering functions
 export function renderObjectTemplate(template, data) {
   let rendered = JSON.parse(JSON.stringify(template));

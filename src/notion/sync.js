@@ -642,6 +642,138 @@ export async function syncObjectToNotion(parsed) {
   }
 }
 
+export async function syncFlowToNotion(parsed) {
+  const {
+    api_name,
+    label,
+    description,
+    status,
+    process_type,
+    decisions,
+    recordUpdates,
+    start,
+    object,
+    operator,
+    details,
+  } = parsed;
+
+  // Prepare flow data for the template
+  const flowData = {
+    FLOW_NAME: label || api_name,
+    FLOW_API_NAME: api_name,
+    FLOW_DESCRIPTION: description,
+    FLOW_STATUS: status,
+    FLOW_PROCESS_TYPE: process_type,
+    OBJECT: object || "",
+    OPERATOR: operator || "",
+    CRITERIA:
+      start &&
+      start.filters &&
+      start.filters.length > 0 &&
+      start.filters[0].field
+        ? `${start.filters[0].field} ${operator}`
+        : "",
+    SCHEDULE: start && start.schedule ? start.schedule : "",
+    VARIABLES_TABLE: "(Variables table rendering TBD)",
+    INPUT_PARAMS_TABLE: "(Input params table rendering TBD)",
+    OUTPUT_PARAMS_TABLE: "(Output params table rendering TBD)",
+    MERMAID_DIAGRAM: `graph TD\n  Start((Start)) --> D1[Decision: ...]`, // Placeholder, can be improved
+    STEP_1: "Describe step 1",
+    STEP_2: "Describe step 2",
+    APEX_CLASSES: "(List Apex classes if any)",
+    CUSTOM_OBJECTS: object || "",
+    OTHER_FLOWS: "(List other flows if any)",
+    LIMITATIONS: "(List limitations)",
+    PERFORMANCE: "(Performance notes)",
+    BULK_NOTES: "(Bulk processing notes)",
+    TEST_SCENARIOS: "(Test scenarios)",
+    EXPECTED_OUTCOMES: "(Expected outcomes)",
+    EDGE_CASES: "(Edge cases)",
+    CHANGELOG_TABLE: "(Changelog table rendering TBD)",
+  };
+
+  // Notion parent logic (same as syncObjectToNotion)
+  let parentId =
+    process.env.NOTION_DATABASE_ID || process.env.NOTION_ROOT_PAGE_ID;
+  let parentType = null;
+  if (process.env.NOTION_DATABASE_ID) {
+    parentType = "database_id";
+  } else if (process.env.NOTION_ROOT_PAGE_ID) {
+    parentType = "page_id";
+  }
+  if (!parentId) {
+    console.log("Searching for accessible pages...");
+    const searchResult = await notionMcpRequest("/search", "POST", {
+      filter: { property: "object", value: "page" },
+      page_size: 5,
+    });
+    if (searchResult.results && searchResult.results.length > 0) {
+      parentId = searchResult.results[0].id;
+      parentType = "page_id";
+      console.log("Using first accessible page as parent:", parentId);
+    }
+  }
+  if (!parentId) {
+    // Create page in workspace (no parent specified)
+    const pagePayload = {
+      parent: { type: "workspace" },
+      properties: {
+        title: {
+          title: [
+            {
+              text: {
+                content: flowData.FLOW_NAME,
+              },
+            },
+          ],
+        },
+      },
+      children: [
+        {
+          object: "block",
+          type: "heading_1",
+          heading_1: {
+            rich_text: [
+              {
+                text: {
+                  content: flowData.FLOW_NAME,
+                },
+              },
+            ],
+          },
+        },
+        {
+          object: "block",
+          type: "paragraph",
+          paragraph: {
+            rich_text: [
+              {
+                text: {
+                  content: flowData.FLOW_DESCRIPTION,
+                },
+              },
+            ],
+          },
+        },
+      ],
+    };
+    const response = await notionMcpRequest("/pages", "POST", pagePayload);
+    parentId = response.id;
+    parentType = "page_id";
+  }
+
+  // Create the Flow documentation page using the template
+  const mainPage = await templateManager.createPageFromTemplate(
+    "flows",
+    "overview",
+    flowData,
+    parentId,
+    notionMcpRequest
+  );
+  console.log("Notion Flow template page created successfully:", mainPage.id);
+  console.log("Page URL:", mainPage.url);
+}
+
 // Read from DB and sync to Notion MCP
 export async function syncOpportunityFromDbToNotion() {
   const db = await getDb();
