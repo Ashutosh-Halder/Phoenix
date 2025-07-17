@@ -197,3 +197,154 @@ export async function syncObjectToDb(parsed) {
   }
   await db.close();
 }
+
+export async function syncProfileToDb(
+  parsed,
+  api_name,
+  label = null,
+  description = null
+) {
+  const db = await getDb();
+  // Upsert profile
+  let profileId;
+  const profileRow = await db.get(
+    "SELECT id FROM profiles WHERE api_name = ?",
+    api_name
+  );
+  if (profileRow) {
+    await db.run(
+      "UPDATE profiles SET label = ?, description = ?, last_modified = CURRENT_TIMESTAMP WHERE id = ?",
+      label,
+      description,
+      profileRow.id
+    );
+    profileId = profileRow.id;
+  } else {
+    const result = await db.run(
+      "INSERT INTO profiles (api_name, label, description) VALUES (?, ?, ?)",
+      api_name,
+      label,
+      description
+    );
+    profileId = result.lastID;
+  }
+  // Upsert applicationVisibilities
+  for (const av of parsed.applicationVisibilities) {
+    await db.run(
+      `INSERT INTO profile_application_visibilities (profile_id, application, visible, default, details_json) VALUES (?, ?, ?, ?, ?)
+      ON CONFLICT(profile_id, application) DO UPDATE SET visible=excluded.visible, default=excluded.default, details_json=excluded.details_json`,
+      profileId,
+      av.application,
+      av.visible === "true" || av.visible === true,
+      av.default === "true" || av.default === true,
+      JSON.stringify(av)
+    );
+  }
+  // Upsert classAccesses
+  for (const ca of parsed.classAccesses) {
+    await db.run(
+      `INSERT INTO profile_class_accesses (profile_id, apexClass, enabled, details_json) VALUES (?, ?, ?, ?)
+      ON CONFLICT(profile_id, apexClass) DO UPDATE SET enabled=excluded.enabled, details_json=excluded.details_json`,
+      profileId,
+      ca.apexClass,
+      ca.enabled === "true" || ca.enabled === true,
+      JSON.stringify(ca)
+    );
+  }
+  // Upsert fieldPermissions
+  for (const fp of parsed.fieldPermissions) {
+    await db.run(
+      `INSERT INTO profile_field_permissions (profile_id, field, readable, editable, details_json) VALUES (?, ?, ?, ?, ?)
+      ON CONFLICT(profile_id, field) DO UPDATE SET readable=excluded.readable, editable=excluded.editable, details_json=excluded.details_json`,
+      profileId,
+      fp.field,
+      fp.readable === "true" || fp.readable === true,
+      fp.editable === "true" || fp.editable === true,
+      JSON.stringify(fp)
+    );
+  }
+  // Upsert objectPermissions
+  for (const op of parsed.objectPermissions) {
+    await db.run(
+      `INSERT INTO profile_object_permissions (profile_id, object, allowCreate, allowRead, allowEdit, allowDelete, modifyAllRecords, viewAllRecords, details_json) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+      ON CONFLICT(profile_id, object) DO UPDATE SET allowCreate=excluded.allowCreate, allowRead=excluded.allowRead, allowEdit=excluded.allowEdit, allowDelete=excluded.allowDelete, modifyAllRecords=excluded.modifyAllRecords, viewAllRecords=excluded.viewAllRecords, details_json=excluded.details_json`,
+      profileId,
+      op.object,
+      op.allowCreate === "true" || op.allowCreate === true,
+      op.allowRead === "true" || op.allowRead === true,
+      op.allowEdit === "true" || op.allowEdit === true,
+      op.allowDelete === "true" || op.allowDelete === true,
+      op.modifyAllRecords === "true" || op.modifyAllRecords === true,
+      op.viewAllRecords === "true" || op.viewAllRecords === true,
+      JSON.stringify(op)
+    );
+  }
+  // Upsert userPermissions
+  for (const up of parsed.userPermissions) {
+    await db.run(
+      `INSERT INTO profile_user_permissions (profile_id, name, enabled, details_json) VALUES (?, ?, ?, ?)
+      ON CONFLICT(profile_id, name) DO UPDATE SET enabled=excluded.enabled, details_json=excluded.details_json`,
+      profileId,
+      up.name,
+      up.enabled === "true" || up.enabled === true,
+      JSON.stringify(up)
+    );
+  }
+  // Upsert layoutAssignments
+  for (const la of parsed.layoutAssignments) {
+    await db.run(
+      `INSERT INTO profile_layout_assignments (profile_id, layout, recordType, details_json) VALUES (?, ?, ?, ?)
+      ON CONFLICT(profile_id, layout, recordType) DO UPDATE SET details_json=excluded.details_json`,
+      profileId,
+      la.layout,
+      la.recordType,
+      JSON.stringify(la)
+    );
+  }
+  // Upsert recordTypeVisibilities
+  for (const rtv of parsed.recordTypeVisibilities) {
+    await db.run(
+      `INSERT INTO profile_record_type_visibilities (profile_id, recordType, visible, default, details_json) VALUES (?, ?, ?, ?, ?)
+      ON CONFLICT(profile_id, recordType) DO UPDATE SET visible=excluded.visible, default=excluded.default, details_json=excluded.details_json`,
+      profileId,
+      rtv.recordType,
+      rtv.visible === "true" || rtv.visible === true,
+      rtv.default === "true" || rtv.default === true,
+      JSON.stringify(rtv)
+    );
+  }
+  // Upsert tabVisibilities
+  for (const tv of parsed.tabVisibilities) {
+    await db.run(
+      `INSERT INTO profile_tab_visibilities (profile_id, tab, visibility, details_json) VALUES (?, ?, ?, ?)
+      ON CONFLICT(profile_id, tab) DO UPDATE SET visibility=excluded.visibility, details_json=excluded.details_json`,
+      profileId,
+      tv.tab,
+      tv.visibility,
+      JSON.stringify(tv)
+    );
+  }
+  // Upsert pageAccesses
+  for (const pa of parsed.pageAccesses) {
+    await db.run(
+      `INSERT INTO profile_page_accesses (profile_id, apexPage, enabled, details_json) VALUES (?, ?, ?, ?)
+      ON CONFLICT(profile_id, apexPage) DO UPDATE SET enabled=excluded.enabled, details_json=excluded.details_json`,
+      profileId,
+      pa.apexPage,
+      pa.enabled === "true" || pa.enabled === true,
+      JSON.stringify(pa)
+    );
+  }
+  // Upsert flowAccesses
+  for (const fa of parsed.flowAccesses) {
+    await db.run(
+      `INSERT INTO profile_flow_accesses (profile_id, flow, enabled, details_json) VALUES (?, ?, ?, ?)
+      ON CONFLICT(profile_id, flow) DO UPDATE SET enabled=excluded.enabled, details_json=excluded.details_json`,
+      profileId,
+      fa.flow,
+      fa.enabled === "true" || fa.enabled === true,
+      JSON.stringify(fa)
+    );
+  }
+  await db.close();
+}

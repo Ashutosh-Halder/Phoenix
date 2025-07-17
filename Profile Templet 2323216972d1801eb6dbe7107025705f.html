@@ -1,0 +1,680 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"/><title>Profile Templet</title><style>
+/* cspell:disable-file */
+/* webkit printing magic: print all background colors */
+html {
+	-webkit-print-color-adjust: exact;
+}
+* {
+	box-sizing: border-box;
+	-webkit-print-color-adjust: exact;
+}
+
+html,
+body {
+	margin: 0;
+	padding: 0;
+}
+@media only screen {
+	body {
+		margin: 2em auto;
+		max-width: 900px;
+		color: rgb(55, 53, 47);
+	}
+}
+
+body {
+	line-height: 1.5;
+	white-space: pre-wrap;
+}
+
+a,
+a.visited {
+	color: inherit;
+	text-decoration: underline;
+}
+
+.pdf-relative-link-path {
+	font-size: 80%;
+	color: #444;
+}
+
+h1,
+h2,
+h3 {
+	letter-spacing: -0.01em;
+	line-height: 1.2;
+	font-weight: 600;
+	margin-bottom: 0;
+}
+
+.page-title {
+	font-size: 2.5rem;
+	font-weight: 700;
+	margin-top: 0;
+	margin-bottom: 0.75em;
+}
+
+h1 {
+	font-size: 1.875rem;
+	margin-top: 1.875rem;
+}
+
+h2 {
+	font-size: 1.5rem;
+	margin-top: 1.5rem;
+}
+
+h3 {
+	font-size: 1.25rem;
+	margin-top: 1.25rem;
+}
+
+.source {
+	border: 1px solid #ddd;
+	border-radius: 3px;
+	padding: 1.5em;
+	word-break: break-all;
+}
+
+.callout {
+	border-radius: 3px;
+	padding: 1rem;
+}
+
+figure {
+	margin: 1.25em 0;
+	page-break-inside: avoid;
+}
+
+figcaption {
+	opacity: 0.5;
+	font-size: 85%;
+	margin-top: 0.5em;
+}
+
+mark {
+	background-color: transparent;
+}
+
+.indented {
+	padding-left: 1.5em;
+}
+
+hr {
+	background: transparent;
+	display: block;
+	width: 100%;
+	height: 1px;
+	visibility: visible;
+	border: none;
+	border-bottom: 1px solid rgba(55, 53, 47, 0.09);
+}
+
+img {
+	max-width: 100%;
+}
+
+@media only print {
+	img {
+		max-height: 100vh;
+		object-fit: contain;
+	}
+}
+
+@page {
+	margin: 1in;
+}
+
+.collection-content {
+	font-size: 0.875rem;
+}
+
+.column-list {
+	display: flex;
+	justify-content: space-between;
+}
+
+.column {
+	padding: 0 1em;
+}
+
+.column:first-child {
+	padding-left: 0;
+}
+
+.column:last-child {
+	padding-right: 0;
+}
+
+.table_of_contents-item {
+	display: block;
+	font-size: 0.875rem;
+	line-height: 1.3;
+	padding: 0.125rem;
+}
+
+.table_of_contents-indent-1 {
+	margin-left: 1.5rem;
+}
+
+.table_of_contents-indent-2 {
+	margin-left: 3rem;
+}
+
+.table_of_contents-indent-3 {
+	margin-left: 4.5rem;
+}
+
+.table_of_contents-link {
+	text-decoration: none;
+	opacity: 0.7;
+	border-bottom: 1px solid rgba(55, 53, 47, 0.18);
+}
+
+table,
+th,
+td {
+	border: 1px solid rgba(55, 53, 47, 0.09);
+	border-collapse: collapse;
+}
+
+table {
+	border-left: none;
+	border-right: none;
+}
+
+th,
+td {
+	font-weight: normal;
+	padding: 0.25em 0.5em;
+	line-height: 1.5;
+	min-height: 1.5em;
+	text-align: left;
+}
+
+th {
+	color: rgba(55, 53, 47, 0.6);
+}
+
+ol,
+ul {
+	margin: 0;
+	margin-block-start: 0.6em;
+	margin-block-end: 0.6em;
+}
+
+li > ol:first-child,
+li > ul:first-child {
+	margin-block-start: 0.6em;
+}
+
+ul > li {
+	list-style: disc;
+}
+
+ul.to-do-list {
+	padding-inline-start: 0;
+}
+
+ul.to-do-list > li {
+	list-style: none;
+}
+
+.to-do-children-checked {
+	text-decoration: line-through;
+	opacity: 0.375;
+}
+
+ul.toggle > li {
+	list-style: none;
+}
+
+ul {
+	padding-inline-start: 1.7em;
+}
+
+ul > li {
+	padding-left: 0.1em;
+}
+
+ol {
+	padding-inline-start: 1.6em;
+}
+
+ol > li {
+	padding-left: 0.2em;
+}
+
+.mono ol {
+	padding-inline-start: 2em;
+}
+
+.mono ol > li {
+	text-indent: -0.4em;
+}
+
+.toggle {
+	padding-inline-start: 0em;
+	list-style-type: none;
+}
+
+/* Indent toggle children */
+.toggle > li > details {
+	padding-left: 1.7em;
+}
+
+.toggle > li > details > summary {
+	margin-left: -1.1em;
+}
+
+.selected-value {
+	display: inline-block;
+	padding: 0 0.5em;
+	background: rgba(206, 205, 202, 0.5);
+	border-radius: 3px;
+	margin-right: 0.5em;
+	margin-top: 0.3em;
+	margin-bottom: 0.3em;
+	white-space: nowrap;
+}
+
+.collection-title {
+	display: inline-block;
+	margin-right: 1em;
+}
+
+.page-description {
+	margin-bottom: 2em;
+}
+
+.simple-table {
+	margin-top: 1em;
+	font-size: 0.875rem;
+	empty-cells: show;
+}
+.simple-table td {
+	height: 29px;
+	min-width: 120px;
+}
+
+.simple-table th {
+	height: 29px;
+	min-width: 120px;
+}
+
+.simple-table-header-color {
+	background: rgb(247, 246, 243);
+	color: black;
+}
+.simple-table-header {
+	font-weight: 500;
+}
+
+time {
+	opacity: 0.5;
+}
+
+.icon {
+	display: inline-block;
+	max-width: 1.2em;
+	max-height: 1.2em;
+	text-decoration: none;
+	vertical-align: text-bottom;
+	margin-right: 0.5em;
+}
+
+img.icon {
+	border-radius: 3px;
+}
+
+.user-icon {
+	width: 1.5em;
+	height: 1.5em;
+	border-radius: 100%;
+	margin-right: 0.5rem;
+}
+
+.user-icon-inner {
+	font-size: 0.8em;
+}
+
+.text-icon {
+	border: 1px solid #000;
+	text-align: center;
+}
+
+.page-cover-image {
+	display: block;
+	object-fit: cover;
+	width: 100%;
+	max-height: 30vh;
+}
+
+.page-header-icon {
+	font-size: 3rem;
+	margin-bottom: 1rem;
+}
+
+.page-header-icon-with-cover {
+	margin-top: -0.72em;
+	margin-left: 0.07em;
+}
+
+.page-header-icon img {
+	border-radius: 3px;
+}
+
+.link-to-page {
+	margin: 1em 0;
+	padding: 0;
+	border: none;
+	font-weight: 500;
+}
+
+p > .user {
+	opacity: 0.5;
+}
+
+td > .user,
+td > time {
+	white-space: nowrap;
+}
+
+input[type="checkbox"] {
+	transform: scale(1.5);
+	margin-right: 0.6em;
+	vertical-align: middle;
+}
+
+p {
+	margin-top: 0.5em;
+	margin-bottom: 0.5em;
+}
+
+.image {
+	border: none;
+	margin: 1.5em 0;
+	padding: 0;
+	border-radius: 0;
+	text-align: center;
+}
+
+.code,
+code {
+	background: rgba(135, 131, 120, 0.15);
+	border-radius: 3px;
+	padding: 0.2em 0.4em;
+	border-radius: 3px;
+	font-size: 85%;
+	tab-size: 2;
+}
+
+code {
+	color: #eb5757;
+}
+
+.code {
+	padding: 1.5em 1em;
+}
+
+.code-wrap {
+	white-space: pre-wrap;
+	word-break: break-all;
+}
+
+.code > code {
+	background: none;
+	padding: 0;
+	font-size: 100%;
+	color: inherit;
+}
+
+blockquote {
+	font-size: 1.25em;
+	margin: 1em 0;
+	padding-left: 1em;
+	border-left: 3px solid rgb(55, 53, 47);
+}
+
+.bookmark {
+	text-decoration: none;
+	max-height: 8em;
+	padding: 0;
+	display: flex;
+	width: 100%;
+	align-items: stretch;
+}
+
+.bookmark-title {
+	font-size: 0.85em;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	height: 1.75em;
+	white-space: nowrap;
+}
+
+.bookmark-text {
+	display: flex;
+	flex-direction: column;
+}
+
+.bookmark-info {
+	flex: 4 1 180px;
+	padding: 12px 14px 14px;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+}
+
+.bookmark-image {
+	width: 33%;
+	flex: 1 1 180px;
+	display: block;
+	position: relative;
+	object-fit: cover;
+	border-radius: 1px;
+}
+
+.bookmark-description {
+	color: rgba(55, 53, 47, 0.6);
+	font-size: 0.75em;
+	overflow: hidden;
+	max-height: 4.5em;
+	word-break: break-word;
+}
+
+.bookmark-href {
+	font-size: 0.75em;
+	margin-top: 0.25em;
+}
+
+.sans { font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol"; }
+.code { font-family: "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace; }
+.serif { font-family: Lyon-Text, Georgia, ui-serif, serif; }
+.mono { font-family: iawriter-mono, Nitti, Menlo, Courier, monospace; }
+.pdf .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK JP'; }
+.pdf:lang(zh-CN) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK SC'; }
+.pdf:lang(zh-TW) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK TC'; }
+.pdf:lang(ko-KR) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK KR'; }
+.pdf .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK JP'; }
+.pdf:lang(zh-CN) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK SC'; }
+.pdf:lang(zh-TW) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK TC'; }
+.pdf:lang(ko-KR) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK KR'; }
+.pdf .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK JP'; }
+.pdf:lang(zh-CN) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK SC'; }
+.pdf:lang(zh-TW) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK TC'; }
+.pdf:lang(ko-KR) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK KR'; }
+.pdf .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK JP'; }
+.pdf:lang(zh-CN) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK SC'; }
+.pdf:lang(zh-TW) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK TC'; }
+.pdf:lang(ko-KR) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK KR'; }
+.highlight-default {
+	color: rgba(50, 48, 44, 1);
+}
+.highlight-gray {
+	color: rgba(115, 114, 110, 1);
+	fill: rgba(115, 114, 110, 1);
+}
+.highlight-brown {
+	color: rgba(159, 107, 83, 1);
+	fill: rgba(159, 107, 83, 1);
+}
+.highlight-orange {
+	color: rgba(217, 115, 13, 1);
+	fill: rgba(217, 115, 13, 1);
+}
+.highlight-yellow {
+	color: rgba(203, 145, 47, 1);
+	fill: rgba(203, 145, 47, 1);
+}
+.highlight-teal {
+	color: rgba(68, 131, 97, 1);
+	fill: rgba(68, 131, 97, 1);
+}
+.highlight-blue {
+	color: rgba(51, 126, 169, 1);
+	fill: rgba(51, 126, 169, 1);
+}
+.highlight-purple {
+	color: rgba(144, 101, 176, 1);
+	fill: rgba(144, 101, 176, 1);
+}
+.highlight-pink {
+	color: rgba(193, 76, 138, 1);
+	fill: rgba(193, 76, 138, 1);
+}
+.highlight-red {
+	color: rgba(205, 60, 58, 1);
+	fill: rgba(205, 60, 58, 1);
+}
+.highlight-default_background {
+	color: rgba(50, 48, 44, 1);
+}
+.highlight-gray_background {
+	background: rgba(248, 248, 247, 1);
+}
+.highlight-brown_background {
+	background: rgba(244, 238, 238, 1);
+}
+.highlight-orange_background {
+	background: rgba(251, 236, 221, 1);
+}
+.highlight-yellow_background {
+	background: rgba(251, 243, 219, 1);
+}
+.highlight-teal_background {
+	background: rgba(237, 243, 236, 1);
+}
+.highlight-blue_background {
+	background: rgba(231, 243, 248, 1);
+}
+.highlight-purple_background {
+	background: rgba(248, 243, 252, 1);
+}
+.highlight-pink_background {
+	background: rgba(252, 241, 246, 1);
+}
+.highlight-red_background {
+	background: rgba(253, 235, 236, 1);
+}
+.block-color-default {
+	color: inherit;
+	fill: inherit;
+}
+.block-color-gray {
+	color: rgba(115, 114, 110, 1);
+	fill: rgba(115, 114, 110, 1);
+}
+.block-color-brown {
+	color: rgba(159, 107, 83, 1);
+	fill: rgba(159, 107, 83, 1);
+}
+.block-color-orange {
+	color: rgba(217, 115, 13, 1);
+	fill: rgba(217, 115, 13, 1);
+}
+.block-color-yellow {
+	color: rgba(203, 145, 47, 1);
+	fill: rgba(203, 145, 47, 1);
+}
+.block-color-teal {
+	color: rgba(68, 131, 97, 1);
+	fill: rgba(68, 131, 97, 1);
+}
+.block-color-blue {
+	color: rgba(51, 126, 169, 1);
+	fill: rgba(51, 126, 169, 1);
+}
+.block-color-purple {
+	color: rgba(144, 101, 176, 1);
+	fill: rgba(144, 101, 176, 1);
+}
+.block-color-pink {
+	color: rgba(193, 76, 138, 1);
+	fill: rgba(193, 76, 138, 1);
+}
+.block-color-red {
+	color: rgba(205, 60, 58, 1);
+	fill: rgba(205, 60, 58, 1);
+}
+.block-color-default_background {
+	color: inherit;
+	fill: inherit;
+}
+.block-color-gray_background {
+	background: rgba(248, 248, 247, 1);
+}
+.block-color-brown_background {
+	background: rgba(244, 238, 238, 1);
+}
+.block-color-orange_background {
+	background: rgba(251, 236, 221, 1);
+}
+.block-color-yellow_background {
+	background: rgba(251, 243, 219, 1);
+}
+.block-color-teal_background {
+	background: rgba(237, 243, 236, 1);
+}
+.block-color-blue_background {
+	background: rgba(231, 243, 248, 1);
+}
+.block-color-purple_background {
+	background: rgba(248, 243, 252, 1);
+}
+.block-color-pink_background {
+	background: rgba(252, 241, 246, 1);
+}
+.block-color-red_background {
+	background: rgba(253, 235, 236, 1);
+}
+.select-value-color-default { background-color: rgba(84, 72, 49, 0.08); }
+.select-value-color-gray { background-color: rgba(84, 72, 49, 0.15); }
+.select-value-color-brown { background-color: rgba(210, 162, 141, 0.35); }
+.select-value-color-orange { background-color: rgba(224, 124, 57, 0.27); }
+.select-value-color-yellow { background-color: rgba(236, 191, 66, 0.39); }
+.select-value-color-green { background-color: rgba(123, 183, 129, 0.27); }
+.select-value-color-blue { background-color: rgba(93, 165, 206, 0.27); }
+.select-value-color-purple { background-color: rgba(168, 129, 197, 0.27); }
+.select-value-color-pink { background-color: rgba(225, 136, 179, 0.27); }
+.select-value-color-red { background-color: rgba(244, 171, 159, 0.4); }
+
+.checkbox {
+	display: inline-flex;
+	vertical-align: text-bottom;
+	width: 16;
+	height: 16;
+	background-size: 16px;
+	margin-left: 2px;
+	margin-right: 5px;
+}
+
+.checkbox-on {
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Crect%20width%3D%2216%22%20height%3D%2216%22%20fill%3D%22%2358A9D7%22%2F%3E%0A%3Cpath%20d%3D%22M6.71429%2012.2852L14%204.9995L12.7143%203.71436L6.71429%209.71378L3.28571%206.2831L2%207.57092L6.71429%2012.2852Z%22%20fill%3D%22white%22%2F%3E%0A%3C%2Fsvg%3E");
+}
+
+.checkbox-off {
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Crect%20x%3D%220.75%22%20y%3D%220.75%22%20width%3D%2214.5%22%20height%3D%2214.5%22%20fill%3D%22white%22%20stroke%3D%22%2336352F%22%20stroke-width%3D%221.5%22%2F%3E%0A%3C%2Fsvg%3E");
+}
+	
+</style></head><body><article id="23232169-72d1-801e-b6db-e7107025705f" class="page sans"><header><h1 class="page-title">Profile Templet</h1><p class="page-description"></p></header><div class="page-body"><h1 id="23232169-72d1-8024-acb6-c7badbab045e" class="">👤 Profile: [Profile Label or FullName]</h1><h2 id="23232169-72d1-80da-bf1d-c9288c100009" class="">🔍 Overview</h2><ul id="23232169-72d1-800b-99d3-ea6959753d45" class="bulleted-list"><li style="list-style-type:disc"><strong>API Name</strong>: <code>[FullName]</code></li></ul><ul id="23232169-72d1-8081-a331-fea4c2edf224" class="bulleted-list"><li style="list-style-type:disc"><strong>User License</strong>: <code>[userLicense]</code></li></ul><ul id="23232169-72d1-80d4-ba1a-e19d1213b5cb" class="bulleted-list"><li style="list-style-type:disc"><strong>Description</strong>: [Add a clear explanation if available in metadata or infer based on permissions]</li></ul><ul id="23232169-72d1-8025-ad46-f94d003c3d4d" class="bulleted-list"><li style="list-style-type:disc"><strong>Purpose</strong>: Describe the purpose of this profile (e.g., used for Sales Reps, External Partners, etc.)</li></ul><hr id="23232169-72d1-80b0-b368-f87cba28fe35"/><h2 id="23232169-72d1-804b-acf9-ed03520ee2df" class="">🔐 Object Permissions</h2><table id="23232169-72d1-808d-ae98-ff8f7a85fad2" class="simple-table"><tbody><tr id="23232169-72d1-8051-98ab-d222243fbdfe"><td id="RF_?" class="">Object</td><td id="RAFS" class="">Read</td><td id="@j]h" class="">Create</td><td id="&lt;qz{" class="">Edit</td><td id="}:z]" class="">Delete</td><td id="U]ju" class="">View All</td><td id="YRA\" class="">Modify All</td></tr><tr id="23232169-72d1-802d-afcc-f5517f4cfaa3"><td id="RF_?" class="">Account</td><td id="RAFS" class="">✅</td><td id="@j]h" class="">✅</td><td id="&lt;qz{" class="">✅</td><td id="}:z]" class="">⛔</td><td id="U]ju" class="">⛔</td><td id="YRA\" class="">⛔</td></tr><tr id="23232169-72d1-8022-8d83-fb66a81afb2e"><td id="RF_?" class="">Contact</td><td id="RAFS" class="">✅</td><td id="@j]h" class="">✅</td><td id="&lt;qz{" class="">✅</td><td id="}:z]" class="">✅</td><td id="U]ju" class="">✅</td><td id="YRA\" class="">✅</td></tr><tr id="23232169-72d1-8095-880e-f559b2a357e3"><td id="RF_?" class="">CustomObject__c</td><td id="RAFS" class="">✅</td><td id="@j]h" class="">⛔</td><td id="&lt;qz{" class="">⛔</td><td id="}:z]" class="">⛔</td><td id="U]ju" class="">⛔</td><td id="YRA\" class="">⛔</td></tr></tbody></table><hr id="23232169-72d1-8036-b845-f15ee248d558"/><h2 id="23232169-72d1-8092-89b2-cd99682f241b" class="">🔑 Field-Level Security (FLS)</h2><h3 id="23232169-72d1-8099-82ab-f052e109db50" class="">Object: Account</h3><table id="23232169-72d1-8079-8ede-e71ff99acd43" class="simple-table"><tbody><tr id="23232169-72d1-806b-8ea0-c2155ab4cef8"><td id="lu|e" class="">Field API Name</td><td id=";aN\" class="">Visible</td><td id="wlTK" class="">Read-Only</td></tr><tr id="23232169-72d1-805a-8433-e8ee831ae6b4"><td id="lu|e" class="">Industry</td><td id=";aN\" class="">✅</td><td id="wlTK" class="">⛔</td></tr><tr id="23232169-72d1-80a5-b34e-eccef260aed4"><td id="lu|e" class="">AnnualRevenue</td><td id=";aN\" class="">✅</td><td id="wlTK" class="">✅</td></tr><tr id="23232169-72d1-8041-9179-d2545260313d"><td id="lu|e" class="">Custom_Field__c</td><td id=";aN\" class="">⛔</td><td id="wlTK" class="">⛔</td></tr></tbody></table><hr id="23232169-72d1-8008-83b8-c292bd6fc40b"/><h2 id="23232169-72d1-8026-8af8-de4ab8832933" class="">📄 Page Layout Assignments</h2><p id="23232169-72d1-8070-a45a-f4a754bd3790" class="">If defined, list assigned layouts per object.</p><hr id="23232169-72d1-8042-bb7f-ced9a7ea5c4a"/><h2 id="23232169-72d1-800f-a799-eb4e89b6bba4" class="">🔗 Record Type Visibility</h2><table id="23232169-72d1-80f6-b0ce-d35a0406756e" class="simple-table"><tbody><tr id="23232169-72d1-80b2-8316-c3b44c01f0cf"><td id="PskF" class="">Object</td><td id="a}j~" class="">Record Types Visible</td><td id="ptkY" class="">Default</td></tr><tr id="23232169-72d1-8028-a228-db7644248b44"><td id="PskF" class="">Lead</td><td id="a}j~" class="">B2B, B2C</td><td id="ptkY" class="">B2B</td></tr><tr id="23232169-72d1-804a-ab4b-e1c2a52eaa09"><td id="PskF" class="">Opportunity</td><td id="a}j~" class="">Standard, Partner Deal</td><td id="ptkY" class="">Standard</td></tr></tbody></table><hr id="23232169-72d1-8089-8822-ef74e31971d4"/><h2 id="23232169-72d1-8029-88ed-faadacc18c32" class="">🧱 App and Tab Visibility</h2><h3 id="23232169-72d1-8085-a42a-f40ec3d2bc8c" class="">Apps</h3><table id="23232169-72d1-8077-95fb-d931be1a86f1" class="simple-table"><tbody><tr id="23232169-72d1-809b-aa51-e0a4e9de500f"><td id="JVfN" class="">App Label</td><td id="]_rZ" class="">Visible</td><td id="GoNm" class="">Default</td></tr><tr id="23232169-72d1-80bc-800c-f795fa730335"><td id="JVfN" class="">Sales</td><td id="]_rZ" class="">✅</td><td id="GoNm" class="">✅</td></tr><tr id="23232169-72d1-8087-a246-fd883dbc7bf2"><td id="JVfN" class="">Service</td><td id="]_rZ" class="">✅</td><td id="GoNm" class="">⛔</td></tr><tr id="23232169-72d1-80ac-a264-f0ecbe07446e"><td id="JVfN" class="">Custom App</td><td id="]_rZ" class="">⛔</td><td id="GoNm" class="">⛔</td></tr></tbody></table><h3 id="23232169-72d1-80cb-ac6f-ca7f00ca3fcd" class="">Tabs</h3><table id="23232169-72d1-806d-9224-c22eb8024210" class="simple-table"><tbody><tr id="23232169-72d1-8008-914e-d47cfa1ff0e0"><td id="VB&lt;e" class="">Tab Name</td><td id="cmGb" class="">Visibility</td></tr><tr id="23232169-72d1-808c-8f34-edb7946af92b"><td id="VB&lt;e" class="">Account</td><td id="cmGb" class="">Default On</td></tr><tr id="23232169-72d1-8032-a463-d2419f285d26"><td id="VB&lt;e" class="">Contact</td><td id="cmGb" class="">Default On</td></tr><tr id="23232169-72d1-8049-b290-eceebc622d02"><td id="VB&lt;e" class="">Setup</td><td id="cmGb" class="">Hidden</td></tr></tbody></table><hr id="23232169-72d1-8021-90d1-def06a551fd1"/><h2 id="23232169-72d1-8086-a525-fdb8b0da6b6e" class="">⚙️ Administrative Permissions</h2><table id="23232169-72d1-8049-960e-fd88b3b6dd50" class="simple-table"><tbody><tr id="23232169-72d1-80b8-bf9f-d06c6b7bb666"><td id="AJ^a" class="">Permission</td><td id="bZds" class="">Enabled</td></tr><tr id="23232169-72d1-804b-9ade-c40cec0d0260"><td id="AJ^a" class="">View Setup and Configuration</td><td id="bZds" class="">✅</td></tr><tr id="23232169-72d1-8064-b0b2-dd791e53fa02"><td id="AJ^a" class="">API Enabled</td><td id="bZds" class="">✅</td></tr><tr id="23232169-72d1-80ca-b2a6-c38fc057306f"><td id="AJ^a" class="">Modify All Data</td><td id="bZds" class="">⛔</td></tr><tr id="23232169-72d1-80c5-96cf-e83396dbe916"><td id="AJ^a" class="">Manage Users</td><td id="bZds" class="">⛔</td></tr></tbody></table><hr id="23232169-72d1-800c-8db5-c4faf10365d6"/><h2 id="23232169-72d1-804c-91a9-e1f4efdb3b4a" class="">🔐 Login Access &amp; Restrictions</h2><table id="23232169-72d1-804c-b974-ddc50f040f22" class="simple-table"><tbody><tr id="23232169-72d1-8063-9b97-d9a9c497d029"><td id="AK~L" class="">Setting</td><td id="LJc?" class="">Value</td></tr><tr id="23232169-72d1-8098-a091-d72a040b08c7"><td id="AK~L" class="">Login Hours</td><td id="LJc?" class="">8:00 AM - 6:00 PM</td></tr><tr id="23232169-72d1-80d5-b076-e71ab5be2a17"><td id="AK~L" class="">IP Ranges</td><td id="LJc?" class="">192.168.0.0/24</td></tr></tbody></table><hr id="23232169-72d1-8006-bb49-ffdc73601963"/><h2 id="23232169-72d1-8084-897d-d33e0b6a56df" class="">🔁 Flow &amp; Apex Class Access</h2><h3 id="23232169-72d1-80de-aea4-c10a88f6fadb" class="">Apex Classes</h3><ul id="23232169-72d1-8088-89a3-c786a0caca54" class="bulleted-list"><li style="list-style-type:disc"><code>LeadAssignmentService</code></li></ul><ul id="23232169-72d1-8025-9eb2-fa3d69a4d6a8" class="bulleted-list"><li style="list-style-type:disc"><code>CustomBatchJob</code></li></ul><h3 id="23232169-72d1-808e-a23d-e24b4fccb57c" class="">Flows</h3><ul id="23232169-72d1-8054-b623-f4d186a5d20f" class="bulleted-list"><li style="list-style-type:disc"><code>Lead_AutoAssign_Flow</code></li></ul><ul id="23232169-72d1-8081-9192-c07e28120ff4" class="bulleted-list"><li style="list-style-type:disc"><code>OnboardingJourney_Flow</code></li></ul><hr id="23232169-72d1-80d4-95f8-efd2c2e8fa29"/><h2 id="23232169-72d1-80d0-96a6-e43ec3a24169" class="">🧠 Notes / Recommendations</h2><ul id="23232169-72d1-8011-9539-cbe518903f8b" class="bulleted-list"><li style="list-style-type:disc">Mention any risk areas (e.g. excessive access, outdated object usage)</li></ul><ul id="23232169-72d1-80bb-8431-df578d733081" class="bulleted-list"><li style="list-style-type:disc">Recommend use of Permission Sets if applicable</li></ul></div></article><span class="sans" style="font-size:14px;padding-top:2em"></span></body></html>
