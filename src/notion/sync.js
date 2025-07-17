@@ -256,6 +256,95 @@ function analyzeValidationRuleMerge(currentRule, allRules) {
   return analysis;
 }
 
+// --- Mapping functions for each subcomponent ---
+function mapObjectPermissions(arr) {
+  return arr.map((d) => ({
+    Object: d.object || d.Object || "",
+    Read: d.allowRead === true || d.allowRead === "true",
+    Create: d.allowCreate === true || d.allowCreate === "true",
+    Edit: d.allowEdit === true || d.allowEdit === "true",
+    Delete: d.allowDelete === true || d.allowDelete === "true",
+    "View All": d.viewAllRecords === true || d.viewAllRecords === "true",
+    "Modify All": d.modifyAllRecords === true || d.modifyAllRecords === "true",
+  }));
+}
+function mapFieldPermissions(arr) {
+  return arr.map((d) => ({
+    Object: d.object || d.Object || "",
+    Field: d.field || d.Field || "",
+    Readable: d.readable === true || d.readable === "true",
+    Editable: d.editable === true || d.editable === "true",
+  }));
+}
+function mapRecordTypeVisibilities(arr) {
+  return arr.map((d) => ({
+    Object: d.object || d.Object || "",
+    "Record Type": d.recordType || d.recordTypeName || d["Record Type"] || "",
+    Visible: d.visible === true || d.visible === "true",
+    Default: d.default === true || d.default === "true",
+  }));
+}
+function mapApplicationVisibilities(arr) {
+  return arr.map((d) => ({
+    Application: d.application || d.Application || "",
+    Visible: d.visible === true || d.visible === "true",
+    Default: d.default === true || d.default === "true",
+  }));
+}
+function mapTabVisibilities(arr) {
+  return arr.map((d) => ({
+    Tab: d.tab || d.Tab || "",
+    Visibility: d.visibility || d.Visibility || "",
+  }));
+}
+function mapClassAccesses(arr) {
+  return arr.map((d) => ({
+    "Apex Class": d.apexClass || d["Apex Class"] || d.apexClassName || "",
+    Enabled:
+      d.enabled === true ||
+      d.enabled === "true" ||
+      d.hasAccess === true ||
+      d.hasAccess === "true",
+  }));
+}
+function mapFlowAccesses(arr) {
+  return arr.map((d) => ({
+    Flow: d.flow || d.Flow || d.flowName || "",
+    Enabled:
+      d.enabled === true ||
+      d.enabled === "true" ||
+      d.hasAccess === true ||
+      d.hasAccess === "true",
+  }));
+}
+function mapUserPermissions(arr) {
+  return arr.map((d) => ({
+    Permission: d.name || d.Permission || d.userPermission || "",
+    Enabled:
+      d.enabled === true ||
+      d.enabled === "true" ||
+      d.allowed === true ||
+      d.allowed === "true",
+  }));
+}
+function mapLayoutAssignments(arr) {
+  return arr.map((d) => ({
+    Object: d.object || d.Object || "",
+    Layout: d.layout || d.Layout || "",
+    RecordType: d.recordType || d.RecordType || "",
+  }));
+}
+function mapPageAccesses(arr) {
+  return arr.map((d) => ({
+    Page: d.apexPage || d.Page || d.apexPageName || "",
+    Enabled:
+      d.enabled === true ||
+      d.enabled === "true" ||
+      d.hasAccess === true ||
+      d.hasAccess === "true",
+  }));
+}
+
 // Remove all object-related sync logic
 // Only keep profile sync logic
 export async function syncProfileToNotion(
@@ -290,13 +379,447 @@ export async function syncProfileToNotion(
   }
   console.log("[DEBUG] Using parentId:", parentId, "parentType:", parentType);
 
-  // Create the main profile page in Notion
-  await templateManager.createPageFromTemplate(
+  // 1. Create the main profile page in Notion and get its ID
+  const mainPage = await templateManager.createPageFromTemplate(
     "profiles",
     "overview",
     profileData,
     parentId,
     null // notionMcpRequest or similar, if needed
   );
+  const mainPageId = mainPage.id;
   console.log("Profile documentation created in Notion.");
+
+  // Log all available template keys for debugging
+  console.log("[DEBUG] profileTemplate keys:", Object.keys(profileTemplate));
+  console.log(
+    "[DEBUG] templateManager.templates.profiles keys:",
+    Object.keys(templateManager.templates.profiles)
+  );
+
+  // 2. Build Notion blocks for each section, matching the HTML template
+  // --- Overview Section ---
+  await notionApiRequest(`/blocks/${mainPageId}/children`, "PATCH", {
+    children: [
+      {
+        object: "block",
+        type: "heading_1",
+        heading_1: {
+          rich_text: [
+            { text: { content: `👤 Profile: ${profileData.PROFILE_LABEL}` } },
+          ],
+        },
+      },
+      {
+        object: "block",
+        type: "heading_2",
+        heading_2: {
+          rich_text: [{ text: { content: "🔍 Overview" } }],
+        },
+      },
+      {
+        object: "block",
+        type: "bulleted_list_item",
+        bulleted_list_item: {
+          rich_text: [
+            { text: { content: `API Name: ${profileData.PROFILE_API_NAME}` } },
+          ],
+        },
+      },
+      {
+        object: "block",
+        type: "bulleted_list_item",
+        bulleted_list_item: {
+          rich_text: [
+            { text: { content: `User License: ${profileData.USER_LICENSE}` } },
+          ],
+        },
+      },
+      {
+        object: "block",
+        type: "bulleted_list_item",
+        bulleted_list_item: {
+          rich_text: [
+            {
+              text: {
+                content: `Description: ${profileData.PROFILE_DESCRIPTION}`,
+              },
+            },
+          ],
+        },
+      },
+      {
+        object: "block",
+        type: "bulleted_list_item",
+        bulleted_list_item: {
+          rich_text: [
+            { text: { content: `Purpose: ${profileData.PROFILE_PURPOSE}` } },
+          ],
+        },
+      },
+      { object: "block", type: "divider", divider: {} },
+    ],
+  });
+
+  // --- Object Permissions Table ---
+  // Create Notion database for Object Permissions as a child of the main page
+  const objectPermsDb = await templateManager.createDatabaseFromTemplate(
+    "profiles",
+    "objectPermissions",
+    profileData,
+    mainPageId
+  );
+  console.log(
+    "[DEBUG] objectPermissions data length:",
+    (parsed.chunks?.objectPermissions?.flat() || []).length,
+    "Sample:",
+    (parsed.chunks?.objectPermissions?.flat() || [])[0]
+  );
+  await templateManager.addDataToDatabase(
+    objectPermsDb.id,
+    "profiles",
+    "objectPermissions",
+    parsed.chunks?.objectPermissions?.flat() || []
+  );
+  await notionApiRequest(`/blocks/${mainPageId}/children`, "PATCH", {
+    children: [
+      {
+        object: "block",
+        type: "heading_2",
+        heading_2: {
+          rich_text: [{ text: { content: "🔐 Object Permissions" } }],
+        },
+      },
+      { object: "block", type: "divider", divider: {} },
+    ],
+  });
+
+  // --- FLS Table ---
+  const flsDb = await templateManager.createDatabaseFromTemplate(
+    "profiles",
+    "fieldPermissions",
+    profileData,
+    mainPageId
+  );
+  console.log(
+    "[DEBUG] fieldPermissions data length:",
+    (parsed.chunks?.fieldPermissions?.flat() || []).length,
+    "Sample:",
+    (parsed.chunks?.fieldPermissions?.flat() || [])[0]
+  );
+  await templateManager.addDataToDatabase(
+    flsDb.id,
+    "profiles",
+    "fieldPermissions",
+    parsed.chunks?.fieldPermissions?.flat() || []
+  );
+  await notionApiRequest(`/blocks/${mainPageId}/children`, "PATCH", {
+    children: [
+      {
+        object: "block",
+        type: "heading_2",
+        heading_2: {
+          rich_text: [{ text: { content: "🔑 Field-Level Security (FLS)" } }],
+        },
+      },
+      { object: "block", type: "divider", divider: {} },
+    ],
+  });
+
+  // --- Record Type Visibility Table ---
+  const recordTypeDb = await templateManager.createDatabaseFromTemplate(
+    "profiles",
+    "recordTypeVisibilities",
+    profileData,
+    mainPageId
+  );
+  console.log(
+    "[DEBUG] recordTypeVisibilities data length:",
+    (parsed.chunks?.recordTypeVisibilities?.flat() || []).length,
+    "Sample:",
+    (parsed.chunks?.recordTypeVisibilities?.flat() || [])[0]
+  );
+  await templateManager.addDataToDatabase(
+    recordTypeDb.id,
+    "profiles",
+    "recordTypeVisibilities",
+    parsed.chunks?.recordTypeVisibilities?.flat() || []
+  );
+  await notionApiRequest(`/blocks/${mainPageId}/children`, "PATCH", {
+    children: [
+      {
+        object: "block",
+        type: "heading_2",
+        heading_2: {
+          rich_text: [{ text: { content: "🔗 Record Type Visibility" } }],
+        },
+      },
+      { object: "block", type: "divider", divider: {} },
+    ],
+  });
+
+  // --- App Visibility Table ---
+  const appDb = await templateManager.createDatabaseFromTemplate(
+    "profiles",
+    "applicationVisibilities",
+    profileData,
+    mainPageId
+  );
+  console.log(
+    "[DEBUG] applicationVisibilities data length:",
+    (parsed.chunks?.applicationVisibilities?.flat() || []).length,
+    "Sample:",
+    (parsed.chunks?.applicationVisibilities?.flat() || [])[0]
+  );
+  await templateManager.addDataToDatabase(
+    appDb.id,
+    "profiles",
+    "applicationVisibilities",
+    parsed.chunks?.applicationVisibilities?.flat() || []
+  );
+  await notionApiRequest(`/blocks/${mainPageId}/children`, "PATCH", {
+    children: [
+      {
+        object: "block",
+        type: "heading_2",
+        heading_2: {
+          rich_text: [{ text: { content: "🧱 App and Tab Visibility" } }],
+        },
+      },
+      {
+        object: "block",
+        type: "heading_3",
+        heading_3: {
+          rich_text: [{ text: { content: "Apps" } }],
+        },
+      },
+      { object: "block", type: "divider", divider: {} },
+    ],
+  });
+
+  // --- Tab Visibility Table ---
+  const tabDb = await templateManager.createDatabaseFromTemplate(
+    "profiles",
+    "tabVisibilities",
+    profileData,
+    mainPageId
+  );
+  console.log(
+    "[DEBUG] tabVisibilities data length:",
+    (parsed.chunks?.tabVisibilities?.flat() || []).length,
+    "Sample:",
+    (parsed.chunks?.tabVisibilities?.flat() || [])[0]
+  );
+  await templateManager.addDataToDatabase(
+    tabDb.id,
+    "profiles",
+    "tabVisibilities",
+    parsed.chunks?.tabVisibilities?.flat() || []
+  );
+  await notionApiRequest(`/blocks/${mainPageId}/children`, "PATCH", {
+    children: [
+      {
+        object: "block",
+        type: "heading_3",
+        heading_3: {
+          rich_text: [{ text: { content: "Tabs" } }],
+        },
+      },
+      { object: "block", type: "divider", divider: {} },
+    ],
+  });
+
+  // --- Administrative Permissions Table ---
+  const adminDb = await templateManager.createDatabaseFromTemplate(
+    "profiles",
+    "userPermissions",
+    profileData,
+    mainPageId
+  );
+  console.log(
+    "[DEBUG] userPermissions data length:",
+    (parsed.chunks?.userPermissions?.flat() || []).length,
+    "Sample:",
+    (parsed.chunks?.userPermissions?.flat() || [])[0]
+  );
+  await templateManager.addDataToDatabase(
+    adminDb.id,
+    "profiles",
+    "userPermissions",
+    parsed.chunks?.userPermissions?.flat() || []
+  );
+  await notionApiRequest(`/blocks/${mainPageId}/children`, "PATCH", {
+    children: [
+      {
+        object: "block",
+        type: "heading_2",
+        heading_2: {
+          rich_text: [{ text: { content: "⚙️ Administrative Permissions" } }],
+        },
+      },
+      { object: "block", type: "divider", divider: {} },
+    ],
+  });
+
+  // --- Login Access & Restrictions Table ---
+  const loginDb = await templateManager.createDatabaseFromTemplate(
+    "profiles",
+    "pageAccesses",
+    profileData,
+    mainPageId
+  );
+  console.log(
+    "[DEBUG] pageAccesses data length:",
+    (parsed.chunks?.pageAccesses?.flat() || []).length,
+    "Sample:",
+    (parsed.chunks?.pageAccesses?.flat() || [])[0]
+  );
+  await templateManager.addDataToDatabase(
+    loginDb.id,
+    "profiles",
+    "pageAccesses",
+    parsed.chunks?.pageAccesses?.flat() || []
+  );
+  await notionApiRequest(`/blocks/${mainPageId}/children`, "PATCH", {
+    children: [
+      {
+        object: "block",
+        type: "heading_2",
+        heading_2: {
+          rich_text: [{ text: { content: "🔐 Login Access & Restrictions" } }],
+        },
+      },
+      { object: "block", type: "divider", divider: {} },
+    ],
+  });
+
+  // --- Flow & Apex Class Access Tables ---
+  const classDb = await templateManager.createDatabaseFromTemplate(
+    "profiles",
+    "classAccesses",
+    profileData,
+    mainPageId
+  );
+  console.log(
+    "[DEBUG] classAccesses data length:",
+    (parsed.chunks?.classAccesses?.flat() || []).length,
+    "Sample:",
+    (parsed.chunks?.classAccesses?.flat() || [])[0]
+  );
+  await templateManager.addDataToDatabase(
+    classDb.id,
+    "profiles",
+    "classAccesses",
+    parsed.chunks?.classAccesses?.flat() || []
+  );
+  const flowDb = await templateManager.createDatabaseFromTemplate(
+    "profiles",
+    "flowAccesses",
+    profileData,
+    mainPageId
+  );
+  console.log(
+    "[DEBUG] flowAccesses data length:",
+    (parsed.chunks?.flowAccesses?.flat() || []).length,
+    "Sample:",
+    (parsed.chunks?.flowAccesses?.flat() || [])[0]
+  );
+  await templateManager.addDataToDatabase(
+    flowDb.id,
+    "profiles",
+    "flowAccesses",
+    parsed.chunks?.flowAccesses?.flat() || []
+  );
+  await notionApiRequest(`/blocks/${mainPageId}/children`, "PATCH", {
+    children: [
+      {
+        object: "block",
+        type: "heading_2",
+        heading_2: {
+          rich_text: [{ text: { content: "🔁 Flow & Apex Class Access" } }],
+        },
+      },
+      {
+        object: "block",
+        type: "heading_3",
+        heading_3: {
+          rich_text: [{ text: { content: "Apex Classes" } }],
+        },
+      },
+      {
+        object: "block",
+        type: "heading_3",
+        heading_3: {
+          rich_text: [{ text: { content: "Flows" } }],
+        },
+      },
+      { object: "block", type: "divider", divider: {} },
+    ],
+  });
+
+  // --- Notes / Recommendations ---
+  await notionApiRequest(`/blocks/${mainPageId}/children`, "PATCH", {
+    children: [
+      {
+        object: "block",
+        type: "heading_2",
+        heading_2: {
+          rich_text: [{ text: { content: "🧠 Notes / Recommendations" } }],
+        },
+      },
+      {
+        object: "block",
+        type: "bulleted_list_item",
+        bulleted_list_item: {
+          rich_text: [
+            {
+              text: {
+                content:
+                  "Mention any risk areas (e.g. excessive access, outdated object usage)",
+              },
+            },
+          ],
+        },
+      },
+      {
+        object: "block",
+        type: "bulleted_list_item",
+        bulleted_list_item: {
+          rich_text: [
+            {
+              text: {
+                content: "Recommend use of Permission Sets if applicable",
+              },
+            },
+          ],
+        },
+      },
+    ],
+  });
+}
+
+// CLI/test entrypoint for Notion sync (ESM compatible)
+if (
+  typeof process !== "undefined" &&
+  typeof import.meta !== "undefined" &&
+  import.meta.url &&
+  process.argv[1] &&
+  process.argv[1].endsWith("sync.js")
+) {
+  const fs = await import("fs");
+  const path = process.argv[2];
+  if (!path) {
+    console.error("Usage: node src/notion/sync.js <parsed-profile.json>");
+    process.exit(1);
+  }
+  const parsed = JSON.parse(fs.readFileSync(path, "utf-8"));
+  const apiName =
+    parsed.raw && parsed.raw.fullName ? parsed.raw.fullName : "Profile";
+  await syncProfileToNotion(
+    parsed,
+    apiName,
+    parsed.label || apiName,
+    parsed.raw.description || ""
+  );
+  console.log("✅ Notion sync complete.");
 }

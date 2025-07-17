@@ -3,6 +3,7 @@ import path from "path";
 import { parseProfile } from "./parser/profileParser.js";
 import { syncProfileToDb } from "./sync.js";
 import { syncProfileToNotion } from "./notion/sync.js";
+import { parseProfileChunked } from "./parser/profileParser.js";
 
 async function main() {
   const arg = process.argv[2];
@@ -35,11 +36,19 @@ async function main() {
       );
       return;
     }
-    const parsed = parseProfile(profilePath);
-    if (!parsed) {
+    // Use chunked parser and flatten chunks for Notion sync
+    const parsedChunked = await parseProfileChunked(profilePath, 100);
+    if (!parsedChunked) {
       console.error("Failed to parse profile XML.");
       return;
     }
+    // Flatten all chunked arrays for Notion sync compatibility
+    const flattenChunks = (chunks) =>
+      Object.fromEntries(Object.entries(chunks).map(([k, v]) => [k, v.flat()]));
+    const parsed = {
+      ...parsedChunked,
+      ...flattenChunks(parsedChunked.chunks),
+    };
     const api_name = profilePath
       .split(/[\/]/)
       .pop()

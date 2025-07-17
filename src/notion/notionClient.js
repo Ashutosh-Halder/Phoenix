@@ -1,3 +1,6 @@
+import dotenv from "dotenv";
+dotenv.config();
+
 const NOTION_API_URL = "https://api.notion.com/v1";
 const NOTION_API_KEY = process.env.NOTION_TOKEN || "";
 
