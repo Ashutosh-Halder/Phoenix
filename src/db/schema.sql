@@ -90,3 +90,110 @@ CREATE TABLE IF NOT EXISTS list_views (
     last_modified DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY(object_id) REFERENCES objects(id)
 );
+
+-- Table for Profiles
+CREATE TABLE IF NOT EXISTS profiles (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    api_name TEXT UNIQUE,
+    label TEXT,
+    description TEXT,
+    last_modified DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS profile_field_permissions (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    profile_id INTEGER,
+    field TEXT,
+    readable BOOLEAN,
+    editable BOOLEAN,
+    details_json TEXT,
+    FOREIGN KEY(profile_id) REFERENCES profiles(id)
+);
+
+CREATE TABLE IF NOT EXISTS profile_object_permissions (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    profile_id INTEGER,
+    object TEXT,
+    allowCreate BOOLEAN,
+    allowRead BOOLEAN,
+    allowEdit BOOLEAN,
+    allowDelete BOOLEAN,
+    modifyAllRecords BOOLEAN,
+    viewAllRecords BOOLEAN,
+    details_json TEXT,
+    FOREIGN KEY(profile_id) REFERENCES profiles(id)
+);
+
+CREATE TABLE IF NOT EXISTS profile_user_permissions (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    profile_id INTEGER,
+    name TEXT,
+    enabled BOOLEAN,
+    details_json TEXT,
+    FOREIGN KEY(profile_id) REFERENCES profiles(id)
+);
+
+CREATE TABLE IF NOT EXISTS profile_application_visibilities (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    profile_id INTEGER,
+    application TEXT,
+    visible BOOLEAN,
+    default BOOLEAN,
+    details_json TEXT,
+    FOREIGN KEY(profile_id) REFERENCES profiles(id)
+);
+
+CREATE TABLE IF NOT EXISTS profile_class_accesses (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    profile_id INTEGER,
+    apexClass TEXT,
+    enabled BOOLEAN,
+    details_json TEXT,
+    FOREIGN KEY(profile_id) REFERENCES profiles(id)
+);
+
+CREATE TABLE IF NOT EXISTS profile_layout_assignments (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    profile_id INTEGER,
+    layout TEXT,
+    recordType TEXT,
+    details_json TEXT,
+    FOREIGN KEY(profile_id) REFERENCES profiles(id)
+);
+
+CREATE TABLE IF NOT EXISTS profile_record_type_visibilities (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    profile_id INTEGER,
+    recordType TEXT,
+    visible BOOLEAN,
+    default BOOLEAN,
+    details_json TEXT,
+    FOREIGN KEY(profile_id) REFERENCES profiles(id)
+);
+
+CREATE TABLE IF NOT EXISTS profile_tab_visibilities (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    profile_id INTEGER,
+    tab TEXT,
+    visibility TEXT,
+    details_json TEXT,
+    FOREIGN KEY(profile_id) REFERENCES profiles(id)
+);
+
+CREATE TABLE IF NOT EXISTS profile_page_accesses (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    profile_id INTEGER,
+    apexPage TEXT,
+    enabled BOOLEAN,
+    details_json TEXT,
+    FOREIGN KEY(profile_id) REFERENCES profiles(id)
+);
+
+CREATE TABLE IF NOT EXISTS profile_flow_accesses (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    profile_id INTEGER,
+    flow TEXT,
+    enabled BOOLEAN,
+    details_json TEXT,
+    FOREIGN KEY(profile_id) REFERENCES profiles(id)
+);

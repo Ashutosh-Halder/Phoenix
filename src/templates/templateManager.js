@@ -1,4 +1,4 @@
-import { objectTemplate, renderObjectTemplate } from "./objectTemplate.js";
+import { profileTemplate, renderProfileTemplate } from "./profileTemplate.js";
 import {
   fetchAllDatabaseRows,
   notionApiRequest,
@@ -8,36 +8,26 @@ import {
 export class TemplateManager {
   constructor() {
     this.templates = {
-      objects: objectTemplate,
-      // Future templates will be added here
-      // fields: fieldTemplate,
-      // validationRules: validationRuleTemplate,
-      // workflows: workflowTemplate,
-      // etc.
+      profiles: profileTemplate,
     };
   }
 
   // Get template for a specific component type
   getTemplate(componentType, templateName) {
-    if (!this.templates[componentType]) {
-      throw new Error(
-        `Template for component type '${componentType}' not found`
-      );
+    // For profiles, return the overview section directly
+    if (componentType === "profiles") {
+      return this.templates[componentType][templateName];
     }
-
-    if (!this.templates[componentType][templateName]) {
-      throw new Error(
-        `Template '${templateName}' not found for component type '${componentType}'`
-      );
-    }
-
-    return this.templates[componentType][templateName];
+    throw new Error(`No template for componentType: ${componentType}`);
   }
 
   // Render a template with data
   renderTemplate(componentType, templateName, data) {
     const template = this.getTemplate(componentType, templateName);
-    return renderObjectTemplate(template, data);
+    if (componentType === "profiles") {
+      return renderProfileTemplate(template, data);
+    }
+    throw new Error(`No render function for componentType: ${componentType}`);
   }
 
   // Create Notion database from template
@@ -45,8 +35,7 @@ export class TemplateManager {
     componentType,
     templateName,
     data,
-    parentPageId,
-    notionClient
+    parentPageId
   ) {
     const template = this.renderTemplate(componentType, templateName, data);
 
@@ -132,7 +121,7 @@ export class TemplateManager {
       properties: notionProperties,
     };
 
-    return await notionClient("/databases", "POST", databasePayload);
+    return await notionApiRequest("/databases", "POST", databasePayload);
   }
 
   // Create Notion page from template
@@ -141,7 +130,6 @@ export class TemplateManager {
     templateName,
     data,
     parentPageId,
-    notionClient,
     isDatabaseParent = false // new flag
   ) {
     const template = this.renderTemplate(componentType, templateName, data);
@@ -177,15 +165,19 @@ export class TemplateManager {
       },
     };
 
+    const parent = parentPageId
+      ? {
+          [parentPageId.length === 32 ? "database_id" : "page_id"]:
+            parentPageId,
+        }
+      : { workspace: true };
     const pagePayload = {
-      parent: isDatabaseParent
-        ? { database_id: parentPageId }
-        : { type: "page_id", page_id: parentPageId },
+      parent,
       properties,
       children: children,
     };
 
-    return await notionClient("/pages", "POST", pagePayload);
+    return await notionApiRequest("/pages", "POST", pagePayload);
   }
 
   // Convert template structure to Notion blocks
@@ -342,7 +334,6 @@ export class TemplateManager {
     componentType,
     templateName,
     dataArray,
-    notionClient,
     allData = [], // pass all data for merge analysis if needed
     concurrency = 3 // limit parallel Notion API calls
   ) {
@@ -629,7 +620,7 @@ export class TemplateManager {
           parent: { database_id: databaseId },
           properties: properties,
         };
-        return await notionClient("/pages", "POST", pagePayload);
+        return await notionApiRequest("/pages", "POST", pagePayload);
       } else {
         // If row exists, check for missing/incomplete columns and update only those
         const updateProps = {};
